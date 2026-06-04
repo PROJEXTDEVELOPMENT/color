@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  ArrowRight,
+  CreditCard,
   Shield,
   User,
   Phone,
@@ -11,6 +13,7 @@ import {
   Loader,
   Lock,
   AlertCircle,
+  Sparkles,
 } from "lucide-react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -24,10 +27,13 @@ export default function KYCPage() {
   const [mobileNumber, setMobileNumber] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
+  const [redirectingToPayment, setRedirectingToPayment] = useState(false);
   const [error, setError] = useState("");
 
   // 🔐 Load logged-in user
   useEffect(() => {
+    router.prefetch("/dashboard/verify");
+
     const raw = localStorage.getItem("user");
     if (!raw) {
       router.replace("/login");
@@ -117,11 +123,12 @@ export default function KYCPage() {
         })
       );
 
-      alert(
-        "✅ KYC submitted successfully.\n\nVerification will be completed within 24 hours."
-      );
+      setSubmitting(false);
+      setRedirectingToPayment(true);
 
-      router.push("/dashboard/verify");
+      setTimeout(() => {
+        router.push("/dashboard/verify");
+      }, 1600);
     } catch (err: any) {
       console.error("KYC submit failed:", err);
       setError(err.message || "Failed to submit KYC. Please try again.");
@@ -131,6 +138,44 @@ export default function KYCPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black text-white p-4 pb-24">
+      {redirectingToPayment && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden bg-[#03070a]/95 px-6 backdrop-blur-xl">
+          <div className="kyc-success-glow kyc-success-enter absolute h-72 w-72 rounded-full bg-cyan-500/25 blur-3xl" />
+          <div className="kyc-success-glow kyc-success-enter absolute h-56 w-56 translate-x-24 translate-y-24 rounded-full bg-blue-500/25 blur-3xl [animation-delay:120ms]" />
+
+          <div className="kyc-success-enter relative w-full max-w-sm text-center">
+            <div className="relative mx-auto mb-7 flex h-28 w-28 items-center justify-center">
+              <div className="kyc-orbit absolute inset-0 rounded-full border border-cyan-300/30" />
+              <div className="kyc-orbit-reverse absolute inset-3 rounded-full border border-blue-300/30" />
+              <div className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-500 shadow-2xl shadow-cyan-500/40">
+                <CheckCircle size={42} className="text-white" />
+              </div>
+              <Sparkles
+                size={18}
+                className="absolute right-2 top-3 text-cyan-200"
+              />
+            </div>
+
+            <div className="mb-3 text-2xl font-black tracking-normal text-white">
+              KYC submitted
+            </div>
+            <p className="mx-auto mb-7 max-w-xs text-sm leading-6 text-gray-300">
+              Taking you to secure payment verification.
+            </p>
+
+            <div className="mx-auto mb-5 flex w-fit items-center gap-3 rounded-full border border-cyan-400/30 bg-white/10 px-4 py-3 shadow-xl shadow-cyan-950/30">
+              <Shield size={18} className="text-emerald-300" />
+              <ArrowRight size={18} className="text-gray-400" />
+              <CreditCard size={18} className="text-cyan-300" />
+            </div>
+
+            <div className="mx-auto h-1.5 w-56 overflow-hidden rounded-full bg-white/10">
+              <div className="kyc-progress h-full rounded-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <button
@@ -204,9 +249,9 @@ export default function KYCPage() {
 
           {/* Submit */}
           <button
-            disabled={submitting}
+            disabled={submitting || redirectingToPayment}
             className={`w-full py-4 rounded-xl font-bold transition ${
-              submitting
+              submitting || redirectingToPayment
                 ? "bg-blue-800"
                 : "bg-gradient-to-r from-blue-500 to-cyan-500 hover:shadow-lg"
             }`}

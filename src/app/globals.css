@@ -24,3 +24,67 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes kyc-success-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes kyc-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kyc-orbit-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes kyc-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes kyc-success-glow {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+}
+
+.kyc-success-enter {
+  animation: kyc-success-enter 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.kyc-orbit {
+  animation: kyc-orbit 1.9s linear infinite;
+}
+
+.kyc-orbit-reverse {
+  animation: kyc-orbit-reverse 2.6s linear infinite;
+}
+
+.kyc-progress {
+  animation: kyc-progress 1.45s ease-out both;
+}
+
+.kyc-success-glow {
+  animation: kyc-success-glow 1.8s ease-in-out infinite;
+}
